@@ -25,12 +25,6 @@ import org.litepal.LitePal;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-* 待解决的问题：更新每条笔记中的内容，如何在原有的基础上进行更新，而不是新建一个实例？
-*               从记事本页面回退到主活动后，如何刷新页面？
-*
-* */
-
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private List<Content> contentList=new ArrayList<>();
@@ -63,6 +57,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setAdapter(adapter);
         addNote.setOnClickListener(this);
     }
+    @Override
+    public void onRestart(){
+        super.onRestart();
+        initView();
+        //————————
+        //若没有这两行代码，则adapter中的list仍然保存的是数据更新前的contentList
+        //所以刷新视图才会没有反应
+        adapter=new MyAdapter(contentList);
+        recyclerView.setAdapter(adapter);
+        //————————
+        adapter.notifyDataSetChanged();
+
+    }
+
 
     @Override
     public void onClick(View view){
@@ -135,8 +143,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     private void refreshNotes(){
         initView();
+        //————————
+        //若没有这两行代码，则adapter中的list仍然保存的是数据更新前的contentList
+        //所以刷新视图才会没有反应
         adapter=new MyAdapter(contentList);
         recyclerView.setAdapter(adapter);
+        //————————
         adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
     }
